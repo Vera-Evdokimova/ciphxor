@@ -7,17 +7,28 @@ import java.nio.file.Paths;
 public class CipherXOR {
     private static byte[] file;
 
-    public static void encrypt(String text, String keyWord) throws IOException {
+    public CipherXOR(CommandLineOptions cmd) throws IOException {
+        this.encrypt(cmd.inputFilename, cmd.key);
+        this.finalise(cmd.outputFilename, cmd.inputFilename);
+    }
+
+    private void encrypt(String text, String keyWord) throws IOException {
         file = Files.readAllBytes(Paths.get(text));
-        byte[] keyarr = keyWord.getBytes();
+        byte[] keyarr = new byte[keyWord.length() / 2];
+        for (int i = 0; i < keyWord.length(); i += 2) {
+            keyarr[i / 2] = (byte) ((Character.digit(keyWord.charAt(i), 16) << 4)
+                    + Character.digit(keyWord.charAt(i + 1), 16));
+        }
+        int key = 0;
         for (int i = 0; i < file.length; i++) {
-            file[i] = (byte) (file[i] ^ keyarr[i % keyarr.length]);
+            file[i] = (byte) (file[i] ^ keyarr[key++]);
+            if (key == keyarr.length) key = 0;
         }
     }
 
-    public static void finalise(String output) throws IOException {
+    private void finalise(String output, String input) throws IOException {
         if (output == null)
-            System.out.println(new String(file));
+            Files.write(Paths.get(input + ".xor"), file);
         else
             Files.write(Paths.get(output), file);
     }
