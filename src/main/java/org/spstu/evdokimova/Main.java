@@ -1,14 +1,13 @@
 package org.spstu.evdokimova;
 
-import java.io.IOException;
-
 public class Main {
     public static void main(String args[]) {
-        CommandLineOptions options = new CommandLineOptions(args);
         try {
-            new CipherXOR(options);
-        } catch (IOException e) {
-            e.printStackTrace();
+            CommandLineOptions options = CommandLineOptions.parse(args);
+            CipherXOR cipherXOR = new CipherXOR(options);
+            cipherXOR.encrypt();
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
         }
     }
 }

@@ -3,21 +3,19 @@ package org.spstu.evdokimova;
 import java.io.*;
 
 public class CipherXOR {
-    private static byte[] key;
+    private byte[] key;
+    private CommandLineOptions cmd;
 
-    public CipherXOR(CommandLineOptions cmd) throws IOException {
-        genKey(cmd.key);
-        this.encrypt(cmd.inputFilename, cmd.outputFilename);
+    public CipherXOR(CommandLineOptions cmd) {
+        this.cmd = cmd;
     }
 
-    private void genKey(String keyWord) {
-        key = new byte[keyWord.length() / 2];
-        for (int i = 0; i < keyWord.length(); i += 2)
-            key[i / 2] = (byte) ((Character.digit(keyWord.charAt(i), 16) << 4)
-                    + Character.digit(keyWord.charAt(i + 1), 16));
-    }
+    public void encrypt() throws IOException {
+        genKey();
 
-    private void encrypt(String text, String output) throws IOException {
+        String text = cmd.getInputFilename();
+        String output = cmd.getOutputFilename();
+
         output = output == null ? text + ".xor" : output;
         byte[] time = new byte[key.length];
         BufferedInputStream bf = new BufferedInputStream(new FileInputStream(new File(text)));
@@ -32,4 +30,11 @@ public class CipherXOR {
         }
     }
 
+    private void genKey() {
+        String keyWord = cmd.getKey();
+        key = new byte[keyWord.length() / 2];
+        for (int i = 0; i < keyWord.length(); i += 2)
+            key[i / 2] = (byte) ((Character.digit(keyWord.charAt(i), 16) << 4)
+                    + Character.digit(keyWord.charAt(i + 1), 16));
+    }
 }
